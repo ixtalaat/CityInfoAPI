@@ -1,4 +1,4 @@
-﻿namespace CityInfoAPI.Services
+﻿namespace CityInfo.API.Services
 {
 	public class CloudMailService : IMailService
 	{

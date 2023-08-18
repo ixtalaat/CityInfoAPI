@@ -1,10 +1,9 @@
-﻿using CityInfoAPI.Models;
-using CityInfoAPI.Services;
-using Microsoft.AspNetCore.Http;
+﻿using CityInfo.API.Models;
+using CityInfo.API.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CityInfoAPI.Controllers
+namespace CityInfo.API.Controllers
 {
 	[Route("api/cities/{cityId}/pointsOfInterest")]
 	[ApiController]
