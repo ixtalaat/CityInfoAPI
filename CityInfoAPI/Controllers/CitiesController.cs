@@ -7,9 +7,11 @@ using System.Text.Json;
 
 namespace CityInfo.API.Controllers
 {
-	[Route("api/cities")]
+	[Route("api/v{version:apiVersion}/cities")]
 	[Authorize]
-	[ApiController]
+	[ApiVersion("1.0")]
+    [ApiVersion("2.0")]
+    [ApiController]
 	public class CitiesController : ControllerBase
 	{
 		private readonly ICityInfoRepository _cityInfoRepository;
@@ -36,7 +38,17 @@ namespace CityInfo.API.Controllers
 			return Ok(_mapper.Map<IEnumerable<CityWithoutPointsOfInterestDto>>(cityEntites));
 		}
 
+		/// <summary>
+		/// Get a city by id
+		/// </summary>
+		/// <param name="id">The id of the city to get</param>
+		/// <param name="includePointsOfInterest">Wheather or not to include the points of interest </param>
+		/// <returns>An IActionRsult</returns>
+		/// <respone code="200">Returns the required city</respone>
 		[HttpGet("{id}")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		[ProducesResponseType(StatusCodes.Status404NotFound)]
+		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		public async Task<IActionResult> GetCityAsync(
 			int id, bool includePointsOfInterest = false)
 		{

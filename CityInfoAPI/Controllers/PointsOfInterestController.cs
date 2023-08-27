@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CityInfo.API.Controllers
 {
-	[Route("api/cities/{cityId}/pointsOfInterest")]
+	[Route("api/v{version:apiVersion}/cities/{cityId}/pointsOfInterest")]
 	[Authorize(Policy = "MustBeFromAntwerp")]
+	[ApiVersion("2.0")]
 	[ApiController]
 	public class PointsOfInterestController : ControllerBase
 	{
@@ -19,7 +20,7 @@ namespace CityInfo.API.Controllers
 		private readonly IMapper _mapper;
 
 		public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailService, ICityInfoRepository cityInfoRepository, IMapper mapper)
-		{
+		{ 
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
 			_cityInfoRepository = cityInfoRepository ?? throw new ArgumentNullException(nameof(cityInfoRepository));
@@ -33,12 +34,12 @@ namespace CityInfo.API.Controllers
 			{
 				//throw new Exception("Exception Sample.");
 
-				var cityName = User.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
+				//var cityName = User.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
 
-				if(!await _cityInfoRepository.CityNameMatchesCityId(cityName, cityId))
-				{
-					return Forbid();
-				}
+				//if(!await _cityInfoRepository.CityNameMatchesCityId(cityName, cityId))
+				//{
+				//	return Forbid();
+				//}
 
 				if (!await _cityInfoRepository.CityExistsAsync(cityId))
 				{

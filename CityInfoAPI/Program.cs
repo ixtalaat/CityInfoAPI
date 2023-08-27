@@ -3,8 +3,11 @@ using CityInfo.API.DbContexts;
 using CityInfo.API.Services;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 using System.Text;
 
 Log.Logger = new LoggerConfiguration()
@@ -29,7 +32,35 @@ builder.Services.AddControllers(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(setupAction =>
+{
+	var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+	var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+	setupAction.IncludeXmlComments(xmlCommentsFullPath);
+
+	setupAction.AddSecurityDefinition("CityInfoApiBearerAuth", new OpenApiSecurityScheme()
+	{
+		Type = SecuritySchemeType.Http,
+		Scheme = "Bearer",
+		Description = "Input a valid token to access the API"
+    });
+
+    setupAction.AddSecurityRequirement(new OpenApiSecurityRequirement
+	{
+		{
+			new OpenApiSecurityScheme
+			{
+				Reference = new OpenApiReference
+				{
+					Type = ReferenceType.SecurityScheme,
+					Id = "CityInfoApiBearerAuth"
+				}
+			}, new List<string>() 
+		}
+	});
+});
+
 builder.Services.AddSingleton<FileExtensionContentTypeProvider>();
 
 #if DEBUG
@@ -70,6 +101,13 @@ builder.Services.AddAuthorization(options =>
 		policy.RequireAuthenticatedUser();
 		policy.RequireClaim("city", "Antwerp");
 	});
+});
+
+builder.Services.AddApiVersioning(setupAction =>
+{
+	setupAction.AssumeDefaultVersionWhenUnspecified = true;
+	setupAction.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+	setupAction.ReportApiVersions = true;
 });
 
 var app = builder.Build();
